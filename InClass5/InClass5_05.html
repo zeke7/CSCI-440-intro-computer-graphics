@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<p> </p>
+<button id = "Button1">Drone Up</button>
+<button id = "Button2">Drone Down</button>
+<button id = "Button3">Drone Forward</button>
+<button id = "Button4">Drone Back</button>
+<button id = "Button5">Drone Left</button>
+<button id = "Button6">Drone Right</button>
+<p> </p>
+<button id = "Button7">Look Up</button>
+<button id = "Button8">Look Down</button>
+<button id = "Button9">Look Forward</button>
+<button id = "Button10">Look Back</button>
+<button id = "Button11">Look Left</button>
+<button id = "Button12">Look Right</button>
+<p> </p>
+<button id = "Button13">Zoom In</button>
+<button id = "Button14">Zoom Out</button>
+<button id = "Button15">View Center</button>
+<button id = "Button16">Drone Home</button>
+<p> </p>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute  vec4 vPosition;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+void main() 
+{
+    gl_Position = projectionMatrix*modelViewMatrix*vPosition;
+} 
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+uniform vec4 fColor;
+
+void
+main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="InClass5_05.js"></script>
+
+<body>
+
+<canvas id="gl-canvas" width="512" height="512">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+
+</body>
+</html>

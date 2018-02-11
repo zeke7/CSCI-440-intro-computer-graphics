@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+// assume both position and normal are in homogeneous form
+attribute vec4 vPosition;
+attribute vec4 vNormal;
+
+varying vec4 fColor;
+
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform vec4 lightPosition;
+uniform float shininess;
+uniform mat3 normalMatrix;
+
+void
+main()
+{    
+    // pos is vertex position in eye coordinates
+    vec3 pos = (modelViewMatrix * vPosition).xyz;
+    
+    // vector from vertex position to light source
+    vec3 L;
+    
+    // check for directional light
+    if(lightPosition.w == 0.0) L = normalize(lightPosition.xyz);
+    else L = normalize( lightPosition.xyz - pos );
+
+    // Because the eye point the is at the orgin
+    // the vector from the vertex position to the eye is
+    vec3 E = -normalize( pos );
+    
+    // halfway vector    
+    vec3 H = normalize( L + E );
+
+    // Transform vertex normal into eye coordinates    
+    vec3 N = normalize( normalMatrix*vNormal.xyz);
+
+    // Compute terms in the illumination equation
+    vec4 ambient = ambientProduct;
+
+    float Kd = max( dot(L, N), 0.0 );
+    vec4  diffuse = Kd*diffuseProduct;
+
+    float Ks = pow( max(dot(N, H), 0.0), shininess );
+    vec4  specular = Ks * specularProduct;
+    
+    if( dot(L, N) < 0.0 ) {
+		specular = vec4(0.0, 0.0, 0.0, 1.0);
+    } 
+
+    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+    
+    fColor = ambient + diffuse + specular;
+    fColor.a = 1.0;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying vec4 fColor;
+
+void
+main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="InClass6_05.js"></script>
+
+<body>
+<canvas id="gl-canvas" width="256" height="256">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+<p> </p>
+<button id = "Button1">Radius +</button>
+<button id = "Button2">Radius -</button>
+<button id = "Button3">Theta +</button>
+<button id = "Button4">Theta -</button>
+<button id = "Button5">Phi +</button>
+<button id = "Button6">Phi -</button>
+<button id = "Button7">Subdivisions +</button>
+<button id = "Button8">Subdivisions -</button>
+<p> </p>
+<button id = "Button9">Light up</button>
+<button id = "Button10">Light down</button>
+<button id = "Button11">Light right</button>
+<button id = "Button12">Light left</button>
+<button id = "Button13">Light forward</button>
+<button id = "Button14">Light backward</button>
+<br/>
+<br/>
+Material, Ambient... 
+R 0.0 <input id="Slider1" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+G 0.0 <input id="Slider2" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+B 0.0 <input id="Slider3" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+<br/>
+Material, Diffuse.....
+R 0.0 <input id="Slider4" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+G 0.0 <input id="Slider5" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+B 0.0 <input id="Slider6" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+<br/>
+Material, Specular...
+R 0.0 <input id="Slider7" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+G 0.0 <input id="Slider8" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+B 0.0 <input id="Slider9" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+<br/>
+Light, Ambient........
+R 0.0 <input id="Slider10" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+G 0.0 <input id="Slider11" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+B 0.0 <input id="Slider12" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+<br/>
+Light, Diffuse..........
+R 0.0 <input id="Slider13" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+G 0.0 <input id="Slider14" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+B 0.0 <input id="Slider15" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+<br/>
+Light, Specular........
+R 0.0 <input id="Slider16" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+G 0.0 <input id="Slider17" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+B 0.0 <input id="Slider18" type="range"
+ min=".0" max="1.0" step="0.1" value="0.5" /> 1.0
+<br/>
+Shininess .....
+0<input id="Slider19" type="range"
+ min="0.0" max="200.0" step="5.0" value="20.0" />
+ 200
+<p> </p>
+</body>
+</html>
